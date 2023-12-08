@@ -19,15 +19,38 @@ class Criteria<T, R> {
     return new Criteria<>(propertyExtractor);
   }
 
+  /**
+   * Returns a Predicate that checks if the property value extracted from an object is equal to the given value.
+   *
+   * @param value the value to compare the property value with
+   * @return a Predicate that performs the equality comparison
+   */
   public Predicate<T> eq(R value) {
     return t -> Objects.equals(propertyExtractor.apply(t), value);
   }
 
+  /**
+   * Returns a Predicate that checks if the property value is less than the given value.
+   *
+   * @param value the value to compare the property value with
+   * @param <V>   the type of the value, must implement the Comparable interface
+   * @return a Predicate that performs the less than comparison
+   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   */
   public <V extends Comparable<V>> Predicate<T> lt(V value) {
-    return compareValue(value, v -> v < 0);
+    return compareToValue(value, v -> v < 0);
   }
 
-  private <V extends Comparable<V>> Predicate<T> compareValue(V value, Predicate<Integer> predicate) {
+  /**
+   * Creates a Predicate that compares a property value of type V with the specified value using the provided Predicate.
+   *
+   * @param value     the value to compare the property value with
+   * @param predicate the Predicate that defines the comparison logic
+   * @param <V>       the type of the property value, must implement the Comparable interface
+   * @return a Predicate that performs the comparison
+   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   */
+  private <V extends Comparable<V>> Predicate<T> compareToValue(V value, Predicate<Integer> predicate) {
     return t -> {
       if (value == null) {
         throw new IllegalArgumentException("Cannot compare property to null");
@@ -47,16 +70,40 @@ class Criteria<T, R> {
     };
   }
 
+  /**
+   * Returns a Predicate that checks if the property value is greater than the given value.
+   *
+   * @param value the value to compare the property value with
+   * @param <V>   the type of the value, must implement the Comparable interface
+   * @return a Predicate that performs the greater than comparison
+   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   */
   public <V extends Comparable<V>> Predicate<T> gt(V value) {
-    return compareValue(value, v -> v > 0);
+    return compareToValue(value, v -> v > 0);
   }
 
+  /**
+   * Returns a Predicate that checks if the property value is greater than or equal to the given value.
+   *
+   * @param value the value to compare the property value with
+   * @param <V>   the type of the value, must implement the Comparable interface
+   * @return a Predicate that performs the greater than or equal to comparison
+   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   */
   public <V extends Comparable<V>> Predicate<T> ge(V value) {
-    return compareValue(value, v -> v >= 0);
+    return compareToValue(value, v -> v >= 0);
   }
 
+  /**
+   * Returns a Predicate that checks if the property value is less than or equal to the given value.
+   *
+   * @param value the value to compare the property value with
+   * @param <V>   the type of the value, must implement the Comparable interface
+   * @return a Predicate that performs the less than or equal to comparison
+   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   */
   public <V extends Comparable<V>> Predicate<T> le(V value) {
-    return compareValue(value, v -> v <= 0);
+    return compareToValue(value, v -> v <= 0);
   }
 
 
