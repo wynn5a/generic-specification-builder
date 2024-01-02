@@ -107,4 +107,13 @@ class Criteria<T, R> {
   }
 
 
+  /**
+   * Returns the property value extracted from the given object.
+   *
+   * @param target the object to extract the property value from
+   * @return the property value
+   */
+  public R get(T target) {
+    return propertyExtractor.apply(target);
+  }
 }
