@@ -1,6 +1,7 @@
 package ltd.mingcloud.specification;
 
 import java.util.Objects;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -12,6 +13,15 @@ class Criteria<T, R> {
     this.propertyExtractor = propertyExtractor;
   }
 
+  /**
+   * Creates a Criteria instance using the given property extractor.
+   *
+   * @param propertyExtractor the property extractor to use
+   * @param <T>               the type of the object to extract the property value from
+   * @param <R>               the type of the property value
+   * @return a Criteria instance
+   * @throws IllegalArgumentException if the property extractor is null
+   */
   public static <T, R> Criteria<T, R> of(Function<T, R> propertyExtractor) {
     if (propertyExtractor == null) {
       throw new IllegalArgumentException("Property Extractor should not be null");
@@ -22,37 +32,37 @@ class Criteria<T, R> {
   /**
    * Returns a Predicate that checks if the property value extracted from an object is equal to the given value.
    *
-   * @param value the value to compare the property value with
+   * @param target the value to compare the property value with
    * @return a Predicate that performs the equality comparison
    */
-  public Predicate<T> eq(R value) {
-    return t -> Objects.equals(propertyExtractor.apply(t), value);
+  public Predicate<T> eq(R target) {
+    return t -> Objects.equals(propertyExtractor.apply(t), target);
   }
 
   /**
    * Returns a Predicate that checks if the property value is less than the given value.
    *
-   * @param value the value to compare the property value with
+   * @param target the value to compare the property value with
    * @param <V>   the type of the value, must implement the Comparable interface
    * @return a Predicate that performs the less than comparison
    * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
    */
-  public <V extends Comparable<V>> Predicate<T> lt(V value) {
-    return compareToValue(value, v -> v < 0);
+  public <V extends Comparable<V>> Predicate<T> lt(V target) {
+    return compare((propertyValue, v) -> propertyValue.compareTo(v) < 0, target);
   }
 
   /**
-   * Creates a Predicate that compares a property value of type V with the specified value using the provided Predicate.
+   * Returns a Predicate that comparing the property value and the given value.
    *
-   * @param value     the value to compare the property value with
-   * @param predicate the Predicate that defines the comparison logic
-   * @param <V>       the type of the property value, must implement the Comparable interface
-   * @return a Predicate that performs the comparison
-   * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
+   * @param target the value to compare the property value with
+   * @param <V>   the type of the value, must implement the Comparable interface
+   * @return a Predicate that performs the equality comparison
+   * @throws IllegalArgumentException if the value or the property value is null,
+   * <br /> or if the property type is not comparable or the value cannot be cast to the property type
    */
-  private <V extends Comparable<V>> Predicate<T> compareToValue(V value, Predicate<Integer> predicate) {
+  public <V extends Comparable<V>> Predicate<T> compare(BiPredicate<V, V> comparison, V target) {
     return t -> {
-      if (value == null) {
+      if (target == null) {
         throw new IllegalArgumentException("Cannot compare property to null");
       }
 
@@ -61,8 +71,7 @@ class Criteria<T, R> {
         if (propertyValue == null) {
           return false;
         }
-        int compared = propertyValue.compareTo(value);
-        return predicate.test(compared);
+        return comparison.test(propertyValue, target);
       } catch (ClassCastException e) {
         throw new IllegalArgumentException(
             "Property type is not comparable or value cannot cast to the type of property for comparing");
@@ -73,37 +82,37 @@ class Criteria<T, R> {
   /**
    * Returns a Predicate that checks if the property value is greater than the given value.
    *
-   * @param value the value to compare the property value with
+   * @param target the value to compare the property value with
    * @param <V>   the type of the value, must implement the Comparable interface
    * @return a Predicate that performs the greater than comparison
    * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
    */
-  public <V extends Comparable<V>> Predicate<T> gt(V value) {
-    return compareToValue(value, v -> v > 0);
+  public <V extends Comparable<V>> Predicate<T> gt(V target) {
+    return compare((propertyValue, v) -> propertyValue.compareTo(v) > 0, target);
   }
 
   /**
    * Returns a Predicate that checks if the property value is greater than or equal to the given value.
    *
-   * @param value the value to compare the property value with
+   * @param target the value to compare the property value with
    * @param <V>   the type of the value, must implement the Comparable interface
    * @return a Predicate that performs the greater than or equal to comparison
    * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
    */
-  public <V extends Comparable<V>> Predicate<T> ge(V value) {
-    return compareToValue(value, v -> v >= 0);
+  public <V extends Comparable<V>> Predicate<T> ge(V target) {
+    return compare((propertyValue, v) -> propertyValue.compareTo(v) >= 0, target);
   }
 
   /**
    * Returns a Predicate that checks if the property value is less than or equal to the given value.
    *
-   * @param value the value to compare the property value with
+   * @param target the value to compare the property value with
    * @param <V>   the type of the value, must implement the Comparable interface
    * @return a Predicate that performs the less than or equal to comparison
    * @throws IllegalArgumentException if the value or the property value is null, or if the property type is not comparable or the value cannot be cast to the property type
    */
-  public <V extends Comparable<V>> Predicate<T> le(V value) {
-    return compareToValue(value, v -> v <= 0);
+  public <V extends Comparable<V>> Predicate<T> le(V target) {
+    return compare((propertyValue, v) -> propertyValue.compareTo(v) <= 0, target);
   }
 
 

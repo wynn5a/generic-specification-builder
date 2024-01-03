@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TestSpecification {
 
-  public static final User ALICE = new User("Alice", 43);
+  static final User ALICE = new User("Alice", 43);
 
   //boolean matched = Selector.of(new User("Alice", 32)).match(Criteria.of(User::name).eq("name"));
   //CriteriaBuilder.and(Criteria.of(User::age).lt(32), Criteria.of(User::age).gt(20))
@@ -182,8 +182,6 @@ public class TestSpecification {
     assertFalse(productPredicate.test(new Product(ALICE, "iPhone 15", 24, "Book")));
   }
 
-  //todo specification use criteria to match object
-
   @Test
   public void specification_should_match_object() {
     Specification<User> spec = Specification.of(Criteria.of(User::age).eq(18));
@@ -219,30 +217,29 @@ public class TestSpecification {
 
   @Test
   public void specification_should_match_object_using_and_or_not() {
-    Specification<User> spec = Specification.of(Specification.and(Criteria.of(User::age).le(18),
-        Specification.or(Criteria.of(User::name).eq("Alice"), Criteria.of(User::name).eq("Bob"))));
+    Specification<User> spec = Specification.of(
+        Specification.and(
+            Criteria.of(User::age).le(18),
+            Specification.or(
+                Criteria.of(User::name).eq("Alice"),
+                Criteria.of(User::name).eq("Bob"))));
     assertTrue(spec.match(new User("Alice", 18)));
     assertTrue(spec.match(new User("Bob", 18)));
     assertFalse(spec.match(new User("Jim", 18)));
   }
 
-  //todo specification can be used in stream
   @Test
   public void specification_should_be_used_in_stream() {
-    Predicate<User> predicate = Specification.and(Criteria.of(User::age).le(18),
-        Specification.or(Criteria.of(User::name).eq("Alice"), Criteria.of(User::name).eq("Bob")));
-    assertEquals(2, Stream.of(new User("Alice", 18), new User("Bob", 18), new User("Jim", 18)).filter(predicate).count());
+    Predicate<User> predicate = Specification.and(
+        Criteria.of(User::age).le(18),
+        Specification.or(
+            Criteria.of(User::name).eq("Alice"),
+            Criteria.of(User::name).eq("Bob")));
+    assertEquals(2, Stream.of(new User("Alice", 18),
+            new User("Bob", 18),
+            new User("Jim", 18))
+        .filter(predicate).count());
   }
-
-  //todo specification can be used in collection
-
-  @Test
-  public void specification_should_be_used_in_collection() {
-    Predicate<User> predicate = Specification.and(Criteria.of(User::age).le(18),
-        Specification.or(Criteria.of(User::name).eq("Alice"), Criteria.of(User::name).eq("Bob")));
-    assertEquals(2, Stream.of(new User("Alice", 18), new User("Bob", 18), new User("Jim", 18)).filter(predicate).count());
-  }
-
 }
 
 record User(String name, int age) {
