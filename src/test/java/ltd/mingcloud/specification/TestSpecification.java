@@ -118,7 +118,7 @@ public class TestSpecification {
     assertFalse(p.test(new User("Jim", 18)));
 
     Predicate<Product> productPredicate = Specification.and(Criteria.of(Product::name).eq("iPhone 15"),
-        Criteria.of(Product::owner).eq(ALICE), Criteria.of(Product::quality).le(10));
+        Criteria.of(Product::owner).eq(ALICE), Criteria.of(Product::quantity).le(10));
     assertTrue(productPredicate.test(new Product(ALICE, "iPhone 15", 2, "Mobile Phone")));
     assertFalse(productPredicate.test(new Product(ALICE, "iPhone 15", 12, "Mobile Phone")));
     assertFalse(productPredicate.test(new Product(ALICE, "iPhone 14", 2, "Mobile Phone")));
@@ -138,7 +138,7 @@ public class TestSpecification {
     assertFalse(p.test(new User("Jim", 19)));
 
     Predicate<Product> productPredicate = Specification.or(Criteria.of(Product::name).eq("iPhone 15"),
-        Criteria.of(Product::owner).eq(ALICE), Criteria.of(Product::quality).le(10));
+        Criteria.of(Product::owner).eq(ALICE), Criteria.of(Product::quantity).le(10));
     assertTrue(productPredicate.test(new Product(ALICE, "iPhone 15", 2, "Mobile Phone")));
     assertTrue(productPredicate.test(new Product(ALICE, "iPhone 15", 12, "Mobile Phone")));
     assertTrue(productPredicate.test(new Product(ALICE, "iPhone 14", 2, "Mobile Phone")));
@@ -173,8 +173,8 @@ public class TestSpecification {
 
     Predicate<Product> productPredicate = Specification.and(Criteria.of(Product::name).eq("iPhone 15"),
         Criteria.of(Product::owner).eq(ALICE),
-        Specification.or(Criteria.of(Product::quality).le(10),
-            Criteria.of(Product::quality).ge(20)),
+        Specification.or(Criteria.of(Product::quantity).le(10),
+            Criteria.of(Product::quantity).ge(20)),
         Specification.not(Criteria.of(Product::type).eq("Book")));
     assertTrue(productPredicate.test(new Product(ALICE, "iPhone 15", 2, "Mobile Phone")));
     assertFalse(productPredicate.test(new Product(ALICE, "iPhone 15", 12, "Mobile Phone")));
@@ -246,7 +246,7 @@ record User(String name, int age) {
 
 }
 
-record Product(User owner, String name, int quality, String type) {
+record Product(User owner, String name, int quantity, String type) {
 
   public Product(User owner) {
     this(owner, null, 0, null);

@@ -15,7 +15,7 @@ Simple code and easy to use
 Predicate<Product> productPredicate = Specification.and(Criteria.of(Product::name).eq("iPhone 15"),
         Criteria.of(Product::owner).eq(ALICE),
         Specification.or(Criteria.of(Product::quality).le(10),
-            Criteria.of(Product::quality).ge(20)),
+            Criteria.of(Product::quantity).ge(20)),
         Specification.not(Criteria.of(Product::type).eq("Book")));
         
 Stream.of(products).filter(productPredicate).count();
